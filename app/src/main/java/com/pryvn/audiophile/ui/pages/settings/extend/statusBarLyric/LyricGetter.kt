@@ -31,7 +31,7 @@ fun LyricGetter(navController: NavController) =
         Column(
             Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.secondary)
+                .background(MaterialTheme.colorScheme.background)
             /*.statusBarsPadding()*/
         ) {
             val apiVersion = remember("apiVersion") {

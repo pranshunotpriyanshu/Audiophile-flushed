@@ -55,7 +55,7 @@ import com.pryvn.audiophile.code.MediaController.musicPlaying
 import com.pryvn.audiophile.code.MediaController.onServiceRunning
 import com.pryvn.audiophile.code.MediaController.playingMusicList
 import com.pryvn.audiophile.code.api.ArchiveTuneApis
-import com.pryvn.audiophile.code.api.AudiophileLyrics
+import com.pryvn.audiophile.code.api.lyrics.AudiophileLyrics
 import com.pryvn.audiophile.code.api.YouTubeApi
 import com.pryvn.audiophile.code.api.parseSyncedLyrics
 import com.pryvn.audiophile.code.utils.lrc.LyricsProcessor
@@ -74,6 +74,7 @@ import com.pryvn.audiophile.data.libraries.YosMediaItem
 import com.pryvn.audiophile.data.libraries.uri
 import com.pryvn.audiophile.data.objects.MainViewModelObject
 import com.pryvn.audiophile.data.objects.MediaViewModelObject
+
 
 @Stable
 object MediaController {

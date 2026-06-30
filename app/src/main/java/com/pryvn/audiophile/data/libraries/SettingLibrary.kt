@@ -309,6 +309,13 @@ object SettingsLibrary {
         initialValue = 0L
     )
 
+    @Stable
+    var YtMusicPlaylistsJson by mutableDataSaverStateOf(
+        dataSaverInterface = SettingsSaver,
+        key = "ytmusic_playlists_json",
+        initialValue = ""
+    )
+
     val isYtMusicLoggedIn: Boolean
         get() = YtMusicCookie.isNotBlank() && YtMusicCookie.contains("SAPISID")
 
@@ -325,6 +332,14 @@ object SettingsLibrary {
     var LocalMusicEnabled by mutableDataSaverStateOf(
         dataSaverInterface = SettingsSaver,
         key = "local_music_enabled",
+        initialValue = false
+    )
+
+    // ---------- Shazam Integration ----------
+    @Stable
+    var ShazamEnabled by mutableDataSaverStateOf(
+        dataSaverInterface = SettingsSaver,
+        key = "shazam_enabled",
         initialValue = false
     )
 }

@@ -76,11 +76,15 @@ import androidx.compose.material3.SliderPositions
 import androidx.compose.material3.Surface
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -177,6 +181,7 @@ import com.pryvn.audiophile.ui.widgets.effects.YosFloatingLight
 import com.pryvn.audiophile.ui.widgets.audio.MusicQualityIndicator
 import com.pryvn.audiophile.ui.widgets.basic.ImageQuality
 import com.pryvn.audiophile.ui.widgets.basic.AppleActionSheet
+import com.pryvn.audiophile.ui.widgets.basic.AppleSheetHeader
 import com.pryvn.audiophile.ui.widgets.basic.AppleSheetMenuRow
 import com.pryvn.audiophile.ui.widgets.basic.ShadowImageWithCache
 import com.pryvn.audiophile.ui.widgets.basic.YosWrapper
@@ -212,6 +217,7 @@ private val MaterialFadeOutTransitionSpec
     )
 */
 
+@OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalSharedTransitionApi
 @androidx.annotation.OptIn(UnstableApi::class)
 @Composable
@@ -454,53 +460,47 @@ fun NowPlaying(
                         //println("nowPageIt: $it")
                         when (it) {
                             Album ->
-                                Column(
-                                    Modifier
-                                        .fillMaxSize()
-                                        .clickable(enabled = false, onClick = {})
-                                ) {
-                                    YosWrapper {
-                                        Column(Modifier.fillMaxHeight(0.595f)) {
-                                            val isVisible = nowPageLambda() == Album
+                                    Column(
+                                        Modifier
+                                            .fillMaxSize()
+                                    ) {
+                                        YosWrapper {
+                                            Column(Modifier.fillMaxHeight(0.595f)) {
+                                                val isVisible = nowPageLambda() == Album
 
-                                            Album(
-                                                modifier = Modifier.sharedElementWithCallerManagedVisibility(
-                                                    sharedContentState = rememberSharedContentState(
-                                                        key = ShareAlbumKey
+                                                Album(
+                                                    modifier = Modifier.sharedElementWithCallerManagedVisibility(
+                                                        sharedContentState = rememberSharedContentState(
+                                                            key = ShareAlbumKey
+                                                        ),
+                                                        visible = isVisible
                                                     ),
-                                                    visible = isVisible
-                                                ),
-                                                albumUrl = { thisMusicPlaying.value?.thumb },
-                                                isPlaying = isPlayingStatusLambda
-                                            )
-                                            AnimatedContent(
-                                                targetState = thisMusicPlaying.value,
-                                                transitionSpec = {
-                                                    fadeIn() togetherWith fadeOut()
-                                                }, modifier = Modifier.padding(horizontal = 32.dp)
-                                            ) {
+                                                    albumUrl = { thisMusicPlaying.value?.thumb },
+                                                    isPlaying = isPlayingStatusLambda
+                                                )
                                                 Row(
                                                     Modifier
-                                                        .fillMaxWidth(),
+                                                        .fillMaxWidth()
+                                                        .padding(horizontal = 32.dp),
                                                     verticalAlignment = Alignment.CenterVertically
                                                 ) {
                                                     Column(
                                                         Modifier
-                                                            .fillMaxWidth()
                                                             .weight(1f)
                                                             .padding(end = 15.dp)
                                                     ) {
+                                                        val song = thisMusicPlaying.value
                                                         Text(
-                                                            text = it?.title
-                                                                ?: defaultTitle,/*
-                                                        fontWeight = FontWeight.Bold,*/
+                                                            text = song?.title
+                                                                ?: defaultTitle,
                                                             fontSize = 19.5.sp,
                                                             maxLines = 1,
                                                             overflow = TextOverflow.Ellipsis,
-                                                            fontWeight = FontWeight.Medium
+                                                            fontWeight = FontWeight.Medium,
+                                                            color = Color.White,
                                                         )
                                                         Text(
-                                                            text = it?.artistsName
+                                                            text = song?.artistsName
                                                                 ?: defaultArtistsName,
                                                             fontSize = 18.5.sp,
                                                             modifier = Modifier.overlayEffect(),
@@ -510,20 +510,19 @@ fun NowPlaying(
                                                         )
                                                     }
 
-                                                        YosWrapper {
-                                                            ActionButtonsRow(
-                                                                musicPlayingLambda = { thisMusicPlaying.value },
-                                                                navController = navController,
-                                                                albumUrlLambda = { thisMusicPlaying.value?.thumb },
-                                                                onShowMenu = { showMenu = true },
-                                                            )
+                                                    YosWrapper {
+                                                        ActionButtonsRow(
+                                                            musicPlayingLambda = { thisMusicPlaying.value },
+                                                            navController = navController,
+                                                            albumUrlLambda = { thisMusicPlaying.value?.thumb },
+                                                            onShowMenu = { showMenu = true },
+                                                        )
                                                     }
                                                 }
                                             }
-                                        }
-                                    }
-                                }
-                            Lyric ->
+                                         }
+                             }
+                              Lyric ->
                                 Column(Modifier.fillMaxSize()) {
                                     YosWrapper {
                                         val isVisible = nowPageLambda() == Lyric
@@ -572,7 +571,6 @@ fun NowPlaying(
                                     Column(
                                         Modifier
                                             .fillMaxSize()
-                                            .clickable(enabled = false, onClick = {})
                                     ) {
                                         val isVisible = nowPageLambda() == PlayingList
                                         PlayingBar(
@@ -1064,9 +1062,54 @@ fun NowPlaying(
                             }
                         }
                     }
-                }
             }
+        }
 
+        if (showMenu) {
+            val song = thisMusicPlaying.value
+            AppleActionSheet(
+                onDismissRequest = { showMenu = false },
+                sheetState = menuSheetState,
+            ) {
+                ThreeDotMenuContent(
+                    musicPlaying = song,
+                    albumUrl = { thisMusicPlaying.value?.thumb },
+                    onDismiss = { showMenu = false },
+                    onShowPlaylistSheet = { showMenu = false; showPlaylistSheet = true },
+                    navController = navController,
+                    context = context,
+                    scope = scope,
+                    onRefetchLyrics = {
+                        scope.launch(Dispatchers.IO) {
+                            val track = thisMusicPlaying.value ?: return@launch
+                            MediaViewModelObject.isLoadingLyrics.value = true
+                            LyricsProcessor.resetLyricsState()
+                            MediaViewModelObject.lrcEntries.value = emptyList()
+                            MediaViewModelObject.otherSideForLines.clear()
+                            val lyrics = ArchiveTuneApis.fetchLyrics(
+                                title = track.title,
+                                artist = track.artists,
+                                album = track.album,
+                                durationMs = track.duration,
+                                videoId = track.mediaId,
+                            )
+                            if (lyrics != null && lyrics.text.isNotBlank()) {
+                                LyricsProcessor.applyLyrics(lyrics) {
+                                    MediaViewModelObject.lrcEntries.value = it
+                                }
+                            }
+                            MediaViewModelObject.isLoadingLyrics.value = false
+                        }
+                    },
+                )
+            }
+        }
+        if (showPlaylistSheet) {
+            AddToPlaylistSheet(
+                song = thisMusicPlaying.value,
+                onDismiss = { showPlaylistSheet = false },
+            )
+        }
         }
     }
 
@@ -1668,7 +1711,6 @@ private fun ThreeDotMenuContent(
     navController: NavController?,
     context: android.content.Context,
     scope: kotlinx.coroutines.CoroutineScope,
-    isLyricsViewArg: Boolean = false,
     onRefetchLyrics: (() -> Unit)? = null,
 ) {
     val song = musicPlaying
@@ -1716,7 +1758,7 @@ private fun ThreeDotMenuContent(
             .clip(RoundedCornerShape(14.dp))
             .background(Color(0xFF2C2C2E)),
     ) {
-        if (isLyricsViewArg && onRefetchLyrics != null) {
+        if (onRefetchLyrics != null) {
             AppleSheetMenuRow(
                 text = "Refetch Lyrics",
                 onClick = { onDismiss(); onRefetchLyrics() },
@@ -1731,7 +1773,7 @@ private fun ThreeDotMenuContent(
         AppleSheetMenuRow(
             text = "Add to Playlist",
             onClick = onShowPlaylistSheet,
-            icon = R.drawable.ic_nowplaying_queue,
+            icon = R.drawable.ic_library_link_icon_playlists,
         )
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -1764,12 +1806,12 @@ private fun ThreeDotMenuContent(
                 text = "View Artist",
                 onClick = {
                     onDismiss()
-                    val artistName = song.artists
-                    try {
-                        val url = "https://music.youtube.com/search?q=${android.net.Uri.encode(artistName)}"
-                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
-                        context.startActivity(intent)
-                    } catch (_: Exception) {}
+                    navController?.let { nv ->
+                        val artistName = song.artists
+                        com.pryvn.audiophile.ui.UI.YTMusicSearch.let { route ->
+                            nv.navigate("$route/${android.net.Uri.encode(artistName)}")
+                        }
+                    }
                 },
                 icon = R.drawable.ic_library_link_icon_artists,
             )
@@ -1784,12 +1826,12 @@ private fun ThreeDotMenuContent(
                 text = "View Album",
                 onClick = {
                     onDismiss()
-                    val albumName = song.album
-                    try {
-                        val url = "https://music.youtube.com/search?q=${android.net.Uri.encode(albumName)}"
-                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
-                        context.startActivity(intent)
-                    } catch (_: Exception) {}
+                    navController?.let { nv ->
+                        val albumName = song.album
+                        com.pryvn.audiophile.ui.UI.YTMusicSearch.let { route ->
+                            nv.navigate("$route/${android.net.Uri.encode(albumName)}")
+                        }
+                    }
                 },
                 icon = R.drawable.ic_library_link_icon_album,
             )
@@ -1862,100 +1904,131 @@ private fun AddToPlaylistSheet(song: YosMediaItem?, onDismiss: () -> Unit) {
     val playlists = PlayListLibrary.playList
     var showCreateDialog by remember { mutableStateOf(false) }
     var newPlaylistName by remember { mutableStateOf("") }
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surface,
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-    ) {
-        Column(Modifier.padding(bottom = 24.dp)) {
-            Text(
-                text = "Add to Playlist",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = SfProFontFamily,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
-            )
+    AppleActionSheet(onDismissRequest = onDismiss) {
+        Column(Modifier.padding(bottom = 16.dp)) {
+            AppleSheetHeader(title = "Add to Playlist")
             if (playlists.isEmpty()) {
                 Text(
-                    text = "No playlists yet. Create one below.",
+                    text = "No playlists yet",
                     fontSize = 14.sp,
                     fontFamily = SfProFontFamily,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    color = Color.White.copy(alpha = 0.45f),
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
                 )
             } else {
-                playlists.forEach { playlist ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(Color(0xFF2C2C2E)),
+                ) {
+                    playlists.forEachIndexed { index, playlist ->
+                        if (index > 0) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                thickness = 0.5.dp,
+                                color = Color.White.copy(alpha = 0.08f),
+                            )
+                        }
+                        AppleSheetMenuRow(
+                            text = playlist.name,
+                            onClick = {
                                 if (song != null) {
                                     with(PlayListLibrary) { playlist.addMusic(song) }
                                 }
                                 onDismiss()
-                            }
-                            .padding(horizontal = 20.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = playlist.name,
-                            fontSize = 15.sp,
-                            fontFamily = SfProFontFamily,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            },
                         )
                     }
                 }
             }
             Spacer(Modifier.height(8.dp))
-            TextButton(
-                onClick = { showCreateDialog = true },
-                modifier = Modifier.padding(horizontal = 16.dp),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Color(0xFF2C2C2E)),
             ) {
-                Text(
+                AppleSheetMenuRow(
                     text = "Create New Playlist",
-                    fontFamily = SfProFontFamily,
-                    fontWeight = FontWeight.SemiBold,
+                    onClick = { showCreateDialog = true },
+                    tint = Color(0xFF0A84FF),
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Color(0xFF2C2C2E)),
+            ) {
+                AppleSheetMenuRow(
+                    text = "Cancel",
+                    onClick = onDismiss,
+                    tint = Color(0xFF0A84FF),
                 )
             }
         }
     }
     if (showCreateDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showCreateDialog = false
-                newPlaylistName = ""
-            },
-            title = {
-                Text("New Playlist", fontFamily = SfProFontFamily)
-            },
-            text = {
+        AppleActionSheet(onDismissRequest = {
+            showCreateDialog = false
+            newPlaylistName = ""
+        }) {
+            Column(Modifier.padding(bottom = 16.dp)) {
+                AppleSheetHeader(title = "New Playlist")
+                Spacer(Modifier.height(12.dp))
                 OutlinedTextField(
                     value = newPlaylistName,
                     onValueChange = { newPlaylistName = it },
-                    placeholder = { Text("Playlist name", fontFamily = SfProFontFamily) },
+                    placeholder = { Text("Playlist name", fontSize = 14.sp, fontFamily = SfProFontFamily) },
                     singleLine = true,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                    textStyle = TextStyle(fontSize = 14.sp, fontFamily = SfProFontFamily, color = Color.White),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF0A84FF),
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
+                        cursorColor = Color(0xFF0A84FF),
+                        focusedPlaceholderColor = Color.White.copy(alpha = 0.45f),
+                        unfocusedPlaceholderColor = Color.White.copy(alpha = 0.45f),
+                    ),
                 )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    if (newPlaylistName.isNotBlank()) {
-                        PlayListLibrary.create(newPlaylistName)
-                        newPlaylistName = ""
-                        showCreateDialog = false
-                    }
-                }) {
-                    Text("Create", fontFamily = SfProFontFamily)
+                Spacer(Modifier.height(20.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TextButton(
+                        onClick = {
+                            showCreateDialog = false
+                            newPlaylistName = ""
+                        },
+                        modifier = Modifier.weight(1f).height(44.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF0A84FF)),
+                    ) { Text("Cancel", fontSize = 14.sp, fontFamily = SfProFontFamily) }
+                    Button(
+                        onClick = {
+                            if (newPlaylistName.isNotBlank()) {
+                                PlayListLibrary.create(newPlaylistName)
+                                newPlaylistName = ""
+                                showCreateDialog = false
+                            }
+                        },
+                        modifier = Modifier.weight(1f).height(44.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF0A84FF),
+                            contentColor = Color.White,
+                        ),
+                        enabled = newPlaylistName.isNotBlank(),
+                    ) { Text("Create", fontSize = 14.sp, fontFamily = SfProFontFamily) }
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showCreateDialog = false
-                    newPlaylistName = ""
-                }) {
-                    Text("Cancel", fontFamily = SfProFontFamily)
-                }
-            },
-        )
+            }
+        }
     }
 }
 
@@ -2207,30 +2280,6 @@ fun RowScope.AirPlay() {
                     overflow = TextOverflow.Ellipsis
                 )
             }
-        }
-
-        if (showMenu) {
-            val song = thisMusicPlaying.value
-            AppleActionSheet(
-                onDismissRequest = { showMenu = false },
-                sheetState = menuSheetState,
-            ) {
-                ThreeDotMenuContent(
-                    musicPlaying = song,
-                    albumUrl = { thisMusicPlaying.value?.thumb },
-                    onDismiss = { showMenu = false },
-                    onShowPlaylistSheet = { showMenu = false; showPlaylistSheet = true },
-                    navController = navController,
-                    context = context,
-                    scope = scope,
-                )
-            }
-        }
-        if (showPlaylistSheet) {
-            AddToPlaylistSheet(
-                song = thisMusicPlaying.value,
-                onDismiss = { showPlaylistSheet = false },
-            )
         }
     }
 }

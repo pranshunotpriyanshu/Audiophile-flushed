@@ -146,6 +146,7 @@ import com.pryvn.audiophile.ui.pages.ytmusic.YTMusicSearchScreen
 import com.pryvn.audiophile.ui.pages.ytmusic.YTMusicPlaylistsScreen
 import com.pryvn.audiophile.ui.pages.settings.performance.userinterface.ScreenCornerSetDialog
 import com.pryvn.audiophile.ui.pages.settings.performance.userinterface.UserInterfaceSetting
+import com.pryvn.audiophile.ui.pages.settings.integration.ShazamRecognitionScreen
 import com.pryvn.audiophile.ui.theme.YosMusicTheme
 import com.pryvn.audiophile.ui.theme.YosRoundedCornerShape
 import com.pryvn.audiophile.ui.theme.isAudiophileInDarkMode
@@ -518,7 +519,10 @@ class MainActivity : BaseActivity() {
                                                 NotificationSetting(navController)
                                             }
 
-                                            
+                                            composable(UI.Settings.ShazamRecognition) {
+                                                ShazamRecognitionScreen(navController)
+                                            }
+
                                             composable(UI.YTMusicLogin) {
                                                 YTMusicLoginScreen(navController)
                                             }

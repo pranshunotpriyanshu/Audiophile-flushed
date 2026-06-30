@@ -10,4 +10,4 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun SettingBackground(content: @Composable BoxScope.() -> Unit) =
-    Box(modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colorScheme.secondary), content = content)
+    Box(modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colorScheme.background), content = content)

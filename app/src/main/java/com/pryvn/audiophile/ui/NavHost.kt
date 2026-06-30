@@ -50,6 +50,8 @@ interface UI {
             const val LyricSetting = "LyricSetting"
             const val UserInterfaceSetting = "UserInterfaceSetting"
             const val NotificationSetting = "NotificationSetting"
+
+            const val ShazamRecognition = "ShazamRecognition"
         }
     }
 }

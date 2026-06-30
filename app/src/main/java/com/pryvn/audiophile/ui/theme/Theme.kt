@@ -22,8 +22,12 @@ private val DarkColorScheme = darkColorScheme(
     onBackground = background,
     surface = backgroundDark,
     onSurface = background,
-    secondary = settingBackDark,
-    onSecondary = settingContainerBackDark
+    surfaceVariant = settingBackDark,
+    onSurfaceVariant = background,
+    secondary = settingContainerBackDark,
+    onSecondary = settingBackDark,
+    outline = appleMusicTextSecondaryDark,
+    outlineVariant = appleMusicSeparatorDark,
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -32,8 +36,12 @@ private val LightColorScheme = lightColorScheme(
     onBackground = backgroundDark,
     surface = background,
     onSurface = backgroundDark,
-    secondary = settingBack,
-    onSecondary = settingContainerBack
+    surfaceVariant = settingBack,
+    onSurfaceVariant = backgroundDark,
+    secondary = settingContainerBack,
+    onSecondary = settingBack,
+    outline = appleMusicTextSecondary,
+    outlineVariant = appleMusicSeparator,
 )
 
 @Composable

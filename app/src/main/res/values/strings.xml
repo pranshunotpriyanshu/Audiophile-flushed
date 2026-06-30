@@ -144,4 +144,11 @@
     <string name="settings_local_music">Local Music</string>
     <string name="settings_local_music_desc">Enable local music playback from device storage</string>
     <string name="settings_local_music_title">Local Music</string>
+    <string name="shazam_title">Shazam Recognition</string>
+    <string name="shazam_listen">Listen</string>
+    <string name="shazam_listening">Listening…</string>
+    <string name="shazam_processing">Processing…</string>
+    <string name="shazam_no_match">No match found</string>
+    <string name="shazam_error">Recognition error</string>
+    <string name="shazam_mic_permission">Microphone permission required</string>
 </resources>

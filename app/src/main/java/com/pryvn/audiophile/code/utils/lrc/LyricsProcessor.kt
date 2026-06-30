@@ -1,6 +1,6 @@
 package com.pryvn.audiophile.code.utils.lrc
 
-import com.pryvn.audiophile.code.api.AudiophileLyrics
+import com.pryvn.audiophile.code.api.lyrics.AudiophileLyrics
 import com.pryvn.audiophile.data.objects.MediaViewModelObject
 import com.pryvn.audiophile.data.objects.WordSyncedLine
 import com.pryvn.audiophile.data.objects.WordSyncedWord

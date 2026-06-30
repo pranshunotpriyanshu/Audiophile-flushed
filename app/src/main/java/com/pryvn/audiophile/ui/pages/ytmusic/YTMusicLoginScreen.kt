@@ -60,28 +60,25 @@ fun YTMusicLoginScreen(
         hasNavigated = true
 
         scope.launch(Dispatchers.IO) {
-            try {
-                val accountInfo = YouTubeApi.fetchAccountInfo().getOrNull()
-                if (accountInfo != null) {
-                    SettingsLibrary.YtMusicAccountName = accountInfo.name
-                    SettingsLibrary.YtMusicAccountEmail = accountInfo.email ?: ""
-                    SettingsLibrary.YtMusicAvatarUrl = accountInfo.avatarUrl ?: ""
-                }
-            } catch (_: Exception) {}
+            // Fetch and save account info
+            YouTubeApi.fetchAccountInfo().onSuccess { accountInfo ->
+                SettingsLibrary.YtMusicAccountName = accountInfo.name
+                SettingsLibrary.YtMusicAccountEmail = accountInfo.email ?: ""
+                SettingsLibrary.YtMusicAvatarUrl = accountInfo.avatarUrl ?: ""
+            }.onFailure {
+                // Account info failure is not critical for login
+            }
 
-            try {
-                YouTubeApi.library()
-            } catch (_: Exception) {}
-
-            try {
-                val playlistsResult = YouTubeApi.library()
-                playlistsResult.onSuccess { json ->
-                    val parsedPlaylists = YouTubeApi.parseLibraryPlaylists(json)
-                    for (pl in parsedPlaylists) {
-                        PlayListLibrary.create(pl.title)
-                    }
+            // Sync playlists from YouTube Music library
+            YouTubeApi.library().onSuccess { json ->
+                val parsedPlaylists = YouTubeApi.parseLibraryPlaylists(json)
+                parsedPlaylists.forEach { pl ->
+                    PlayListLibrary.create(pl.title)
                 }
-            } catch (_: Exception) {}
+            }.onFailure {
+                // Playlist sync failure - we still consider login successful
+                // but could show a warning if needed
+            }
 
             withContext(Dispatchers.Main) {
                 val name = SettingsLibrary.YtMusicAccountName

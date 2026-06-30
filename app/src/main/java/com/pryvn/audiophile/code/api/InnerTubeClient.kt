@@ -75,12 +75,12 @@ data class ServiceIntegrityDimensions(
 )
 
 object InnerTubeClient {
-    private const val API_BASE = "https://music.youtube.com/youtubei/v1"
-    private const val API_KEY = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX3"
-    private const val CLIENT_NAME = "WEB_REMIX"
-    private const val CLIENT_VERSION = "1.20260523.01.00"
-    private const val CLIENT_ID = "67"
-    private const val USER_AGENT =
+    const val API_BASE = "https://music.youtube.com/youtubei/v1"
+    const val API_KEY = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
+    const val CLIENT_NAME = "WEB_REMIX"
+    const val CLIENT_VERSION = "1.20260630.01.00"
+    const val CLIENT_ID = "67"
+    const val USER_AGENT =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0"
 
     private val VISITOR_DATA_REGEX = Regex("""C[a-zA-Z0-9_-]{22,}""")
@@ -145,14 +145,14 @@ object InnerTubeClient {
         }
     }
 
-    private fun buildContext(setLogin: Boolean = false): Context {
+    private fun buildContext(setLogin: Boolean = false, clientName: String = CLIENT_NAME, clientVersion: String = CLIENT_VERSION): Context {
         if (authState.visitorData.isNullOrBlank()) {
             authState = authState.copy(visitorData = generateVisitorData()).normalized()
         }
         return Context(
             client = ClientContext(
-                clientName = CLIENT_NAME,
-                clientVersion = CLIENT_VERSION,
+                clientName = clientName,
+                clientVersion = clientVersion,
                 hl = "en",
                 gl = "US",
                 visitorData = authState.visitorData,
@@ -169,14 +169,14 @@ object InnerTubeClient {
         )
     }
 
-    private fun HttpRequestBuilder.ytHeaders(endpoint: String = "", setLogin: Boolean = false) {
+    private fun HttpRequestBuilder.ytHeaders(endpoint: String = "", setLogin: Boolean = false, clientName: String = CLIENT_NAME, clientVersion: String = CLIENT_VERSION, clientId: String = CLIENT_ID, ua: String = USER_AGENT, origin: String = "https://music.youtube.com", referer: String = "https://music.youtube.com/") {
         contentType(ContentType.Application.Json)
         headers {
             append("X-Goog-Api-Format-Version", "1")
-            append("X-YouTube-Client-Name", CLIENT_ID)
-            append("X-YouTube-Client-Version", CLIENT_VERSION)
-            append("X-Origin", "https://music.youtube.com")
-            append("Referer", "https://music.youtube.com/")
+            append("X-YouTube-Client-Name", clientName)
+            append("X-YouTube-Client-Version", clientVersion)
+            append("X-Origin", origin)
+            append("Referer", referer)
             if (endpoint.isNotBlank()) {
                 append("X-Goog-Request-Info", "name=$endpoint")
             }
@@ -189,13 +189,13 @@ object InnerTubeClient {
                     val loginCookie = youtubeLoginCookieValue(cookie)
                     if (loginCookie != null) {
                         val currentTime = System.currentTimeMillis() / 1000
-                        val hash = sha1("$currentTime $loginCookie https://music.youtube.com")
+                        val hash = sha1("$currentTime $loginCookie $origin")
                         append("Authorization", "SAPISIDHASH ${currentTime}_$hash")
                     }
                 }
             }
         }
-        userAgent(USER_AGENT)
+        userAgent(ua)
     }
 
     private suspend fun <T> withRetry(
@@ -264,13 +264,19 @@ object InnerTubeClient {
         params: String? = null,
         continuation: String? = null,
         setLogin: Boolean = false,
+        clientName: String = CLIENT_NAME,
+        clientVersion: String = CLIENT_VERSION,
+        clientId: String = CLIENT_ID,
+        ua: String = USER_AGENT,
+        origin: String = "https://music.youtube.com",
+        referer: String = "https://music.youtube.com/"
     ): Result<JsonObject> = withContext(Dispatchers.IO) {
         runCatching {
             withRetry {
                 client.post("search") {
-                    ytHeaders("search", setLogin = setLogin)
+                    ytHeaders("search", setLogin = setLogin, clientName = clientName, clientVersion = clientVersion, clientId = clientId, ua = ua, origin = origin, referer = referer)
                     setBody(buildJsonObject {
-                        put("context", json.encodeToJsonElement(buildContext(setLogin)))
+                        put("context", json.encodeToJsonElement(buildContext(setLogin = setLogin, clientName = clientName, clientVersion = clientVersion)))
                         query?.let { put("query", it) }
                         params?.let { put("params", it) }
                     })
@@ -290,13 +296,19 @@ object InnerTubeClient {
         params: String? = null,
         continuation: String? = null,
         setLogin: Boolean = false,
+        clientName: String = CLIENT_NAME,
+        clientVersion: String = CLIENT_VERSION,
+        clientId: String = CLIENT_ID,
+        ua: String = USER_AGENT,
+        origin: String = "https://music.youtube.com",
+        referer: String = "https://music.youtube.com/"
     ): Result<JsonObject> = withContext(Dispatchers.IO) {
         runCatching {
             withRetry {
                 client.post("browse") {
-                    ytHeaders("browse", setLogin = setLogin)
+                    ytHeaders("browse", setLogin = setLogin, clientName = clientName, clientVersion = clientVersion, clientId = clientId, ua = ua, origin = origin, referer = referer)
                     setBody(buildJsonObject {
-                        put("context", json.encodeToJsonElement(buildContext(setLogin)))
+                        put("context", json.encodeToJsonElement(buildContext(setLogin = setLogin, clientName = clientName, clientVersion = clientVersion)))
                         browseId?.let { put("browseId", it) }
                         params?.let { put("params", it) }
                         continuation?.let { put("continuation", it) }
@@ -312,13 +324,70 @@ object InnerTubeClient {
         videoId: String,
         playlistId: String? = null,
         signatureTimestamp: Int? = null,
+    ): Result<JsonObject> = playerWithClient(
+        videoId = videoId,
+        clientName = CLIENT_NAME,
+        clientVersion = CLIENT_VERSION,
+        clientId = CLIENT_ID,
+        ua = USER_AGENT,
+        origin = "https://music.youtube.com",
+        referer = "https://music.youtube.com/",
+        playlistId = playlistId,
+        signatureTimestamp = signatureTimestamp,
+    )
+
+    suspend fun playerWithFallback(
+        videoId: String,
+        playlistId: String? = null,
+    ): Result<JsonObject> = withContext(Dispatchers.IO) {
+        val sigTs = YouTubeApi.fetchSignatureTimestamp()
+        val configs = listOf(
+            ClientConfig(CLIENT_NAME, CLIENT_VERSION, CLIENT_ID, ua = USER_AGENT, origin = "https://music.youtube.com", referer = "https://music.youtube.com/"),
+            ClientConfig("WEB", "2.20250101.00.00", "1", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36", "https://www.youtube.com", "https://www.youtube.com/"),
+            ClientConfig("ANDROID", "18.29.38", "2", "com.google.android.apps.youtube.music/18.29.38 (Linux; U; Android 14) gzip", "https://music.youtube.com", "https://music.youtube.com/"),
+            ClientConfig("ANDROID_MUSIC", "6.42.52", "21", "com.google.android.apps.youtube.music/6.42.52 (Linux; U; Android 14) gzip", "https://music.youtube.com", "https://music.youtube.com/"),
+            ClientConfig("IOS", "19.29.1", "5", "com.google.ios.youtube/19.29.1 (iPhone; U; CPU iOS 17_4 like Mac OS X)", "https://www.youtube.com", "https://www.youtube.com/"),
+        )
+        for (config in configs) {
+            val result = runCatching {
+                playerWithClient(videoId, config.clientName, config.clientVersion, config.clientId, config.ua, config.origin, config.referer, playlistId, sigTs).getOrThrow()
+            }
+            if (result.isSuccess) {
+                val sd = result.getOrNull()?.get("streamingData")?.jsonObject
+                if (sd != null && (sd["adaptiveFormats"] != null || sd["formats"] != null || sd["hlsManifestUrl"] != null)) {
+                    return@withContext Result.success(result.getOrNull()!!)
+                }
+            }
+        }
+        player(videoId, playlistId, sigTs)
+    }
+
+    data class ClientConfig(
+        val clientName: String,
+        val clientVersion: String,
+        val clientId: String,
+        val ua: String,
+        val origin: String,
+        val referer: String,
+    )
+
+    private suspend fun playerWithClient(
+        videoId: String,
+        clientName: String,
+        clientVersion: String,
+        clientId: String,
+        ua: String,
+        origin: String,
+        referer: String,
+        playlistId: String? = null,
+        signatureTimestamp: Int? = null,
     ): Result<JsonObject> = withContext(Dispatchers.IO) {
         runCatching {
             withRetry {
                 client.post("player") {
-                    ytHeaders("player", setLogin = hasLoginCookie)
+                    ytHeaders("player", setLogin = hasLoginCookie, clientName = clientName, clientVersion = clientVersion, clientId = clientId, ua = ua, origin = origin, referer = referer)
                     setBody(PlayerBody(
-                        context = buildContext(setLogin = hasLoginCookie),
+                        context = buildContext(setLogin = hasLoginCookie, clientName = clientName, clientVersion = clientVersion),
                         videoId = videoId,
                         playlistId = playlistId,
                         playbackContext = signatureTimestamp?.let {
