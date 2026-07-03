@@ -121,7 +121,9 @@ object YouTubeApi {
             val configs = listOf(
                 ClientConfig(InnerTubeClient.CLIENT_NAME, InnerTubeClient.CLIENT_VERSION, InnerTubeClient.CLIENT_ID, ua = InnerTubeClient.USER_AGENT, origin = "https://music.youtube.com", referer = "https://music.youtube.com/"),
                 ClientConfig("WEB_REMIX", "2.20250101.00.00", "67", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36", "https://www.youtube.com", "https://www.youtube.com/"),
-                ClientConfig("WEB", "2.20250101.00.00", "1", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36", "https://www.youtube.com", "https://www.youtube.com/")
+                ClientConfig("WEB", "2.20250101.00.00", "1", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36", "https://www.youtube.com", "https://www.youtube.com/"),
+                ClientConfig("ANDROID_MUSIC", "6.42.52", "21", "com.google.android.apps.youtube.music/6.42.52 (Linux; U; Android 14) gzip", "https://music.youtube.com", "https://music.youtube.com/"),
+                ClientConfig("IOS", "19.29.1", "5", "com.google.ios.youtube/19.29.1 (iPhone; U; CPU iOS 17_4 like Mac OS X)", "https://www.youtube.com", "https://www.youtube.com/")
             )
 
             for (config in configs) {
@@ -180,7 +182,9 @@ object YouTubeApi {
         val configs = listOf(
             ClientConfig(InnerTubeClient.CLIENT_NAME, InnerTubeClient.CLIENT_VERSION, InnerTubeClient.CLIENT_ID, ua = InnerTubeClient.USER_AGENT, origin = "https://music.youtube.com", referer = "https://music.youtube.com/"),
             ClientConfig("WEB_REMIX", "2.20250101.00.00", "67", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36", "https://www.youtube.com", "https://www.youtube.com/"),
-            ClientConfig("WEB", "2.20250101.00.00", "1", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36", "https://www.youtube.com", "https://www.youtube.com/")
+            ClientConfig("WEB", "2.20250101.00.00", "1", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36", "https://www.youtube.com", "https://www.youtube.com/"),
+            ClientConfig("ANDROID_MUSIC", "6.42.52", "21", "com.google.android.apps.youtube.music/6.42.52 (Linux; U; Android 14) gzip", "https://music.youtube.com", "https://music.youtube.com/"),
+            ClientConfig("IOS", "19.29.1", "5", "com.google.ios.youtube/19.29.1 (iPhone; U; CPU iOS 17_4 like Mac OS X)", "https://www.youtube.com", "https://www.youtube.com/")
         )
 
         val effectiveBrowseId = if (continuation != null) null else browseId
@@ -264,7 +268,9 @@ object YouTubeApi {
         val configs = listOf(
             ClientConfig(InnerTubeClient.CLIENT_NAME, InnerTubeClient.CLIENT_VERSION, InnerTubeClient.CLIENT_ID, ua = InnerTubeClient.USER_AGENT, origin = "https://music.youtube.com", referer = "https://music.youtube.com/"),
             ClientConfig("WEB_REMIX", "2.20250101.00.00", "67", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36", "https://www.youtube.com", "https://www.youtube.com/"),
-            ClientConfig("WEB", "2.20250101.00.00", "1", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36", "https://www.youtube.com", "https://www.youtube.com/")
+            ClientConfig("WEB", "2.20250101.00.00", "1", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36", "https://www.youtube.com", "https://www.youtube.com/"),
+            ClientConfig("ANDROID_MUSIC", "6.42.52", "21", "com.google.android.apps.youtube.music/6.42.52 (Linux; U; Android 14) gzip", "https://music.youtube.com", "https://music.youtube.com/"),
+            ClientConfig("IOS", "19.29.1", "5", "com.google.ios.youtube/19.29.1 (iPhone; U; CPU iOS 17_4 like Mac OS X)", "https://www.youtube.com", "https://www.youtube.com/")
         )
 
         val browseId = if (continuation != null) null else "FEmusic_home"

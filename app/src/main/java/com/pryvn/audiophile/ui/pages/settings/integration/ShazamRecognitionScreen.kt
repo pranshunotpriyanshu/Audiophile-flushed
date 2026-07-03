@@ -24,8 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import com.pryvn.audiophile.ui.widgets.basic.CachedArtworkImage
 import com.pryvn.audiophile.R
 import com.pryvn.audiophile.code.api.shazam.Shazam
 import com.pryvn.audiophile.code.api.shazam.ShazamSignatureGenerator
@@ -218,12 +217,10 @@ private fun RecognitionResultCard(result: RecognitionResult) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (!result.coverArtUrl.isNullOrBlank()) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(result.coverArtUrl)
-                        .crossfade(true)
-                        .build(),
+                CachedArtworkImage(
+                    url = result.coverArtUrl,
                     contentDescription = null,
+                    size = 300,
                     modifier = Modifier
                         .size(160.dp)
                         .clip(RoundedCornerShape(12.dp)),

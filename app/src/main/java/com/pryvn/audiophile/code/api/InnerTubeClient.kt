@@ -78,7 +78,7 @@ object InnerTubeClient {
     const val API_BASE = "https://music.youtube.com/youtubei/v1"
     const val API_KEY = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
     const val CLIENT_NAME = "WEB_REMIX"
-    const val CLIENT_VERSION = "1.20260630.01.00"
+    const val CLIENT_VERSION = "1.20260703.01.00"
     const val CLIENT_ID = "67"
     const val USER_AGENT =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0"
@@ -122,7 +122,7 @@ object InnerTubeClient {
     }
 
     private val client = HttpClient(OkHttp) {
-        expectSuccess = true
+        expectSuccess = false
         install(ContentNegotiation) {
             json(this@InnerTubeClient.json)
         }
@@ -286,9 +286,18 @@ object InnerTubeClient {
                     }
                     parameter("key", API_KEY)
                     parameter("prettyPrint", false)
-                }.body<JsonObject>()
+                }.body<JsonObject>().checkError()
             }
         }
+    }
+
+    private fun JsonObject.checkError(): JsonObject {
+        val err = this["error"]?.jsonObject
+        if (err != null) {
+            val msg = err["message"]?.jsonPrimitive?.contentOrNull ?: "Unknown API error"
+            throw IOException("YouTube API error: $msg")
+        }
+        return this
     }
 
     suspend fun browse(
@@ -315,7 +324,7 @@ object InnerTubeClient {
                     })
                     parameter("key", API_KEY)
                     parameter("prettyPrint", false)
-                }.body<JsonObject>()
+                }.body<JsonObject>().checkError()
             }
         }
     }
@@ -399,7 +408,7 @@ object InnerTubeClient {
                     ))
                     parameter("key", API_KEY)
                     parameter("prettyPrint", false)
-                }.body<JsonObject>()
+                }.body<JsonObject>().checkError()
             }
         }
     }
@@ -421,7 +430,7 @@ object InnerTubeClient {
                     })
                     parameter("key", API_KEY)
                     parameter("prettyPrint", false)
-                }.body<JsonObject>()
+                }.body<JsonObject>().checkError()
             }
         }
     }
@@ -436,7 +445,7 @@ object InnerTubeClient {
                     })
                     parameter("key", API_KEY)
                     parameter("prettyPrint", false)
-                }.body<JsonObject>()
+                }.body<JsonObject>().checkError()
             }
         }
     }
@@ -452,7 +461,7 @@ object InnerTubeClient {
                     })
                     parameter("key", API_KEY)
                     parameter("prettyPrint", false)
-                }.body<JsonObject>()
+                }.body<JsonObject>().checkError()
             }
         }
     }

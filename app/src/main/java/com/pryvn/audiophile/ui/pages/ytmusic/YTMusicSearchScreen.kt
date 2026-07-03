@@ -28,7 +28,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -46,10 +45,8 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import coil.size.Precision
 import com.pryvn.audiophile.R
+import com.pryvn.audiophile.ui.widgets.basic.CachedArtworkImage
 import androidx.navigation.NavController
 import io.github.alexzhirkevich.cupertino.icons.CupertinoIcons
 import io.github.alexzhirkevich.cupertino.icons.outlined.PersonCropCircle
@@ -302,7 +299,7 @@ fun YTMusicSearchScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF000000))
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
     ) {
         // ── Main scrollable content ──
@@ -362,7 +359,7 @@ fun YTMusicSearchScreen(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .fillMaxWidth()
-                .background(Color(0xFF000000))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 20.dp)
                 .padding(top = 40.dp)
         ) {
@@ -376,7 +373,7 @@ fun YTMusicSearchScreen(
                 if (showBackButton || isMoodGenreBrowse) {
                     Box(
                         modifier = Modifier
-                            .size(32.dp)
+                            .size(48.dp)
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
@@ -386,8 +383,8 @@ fun YTMusicSearchScreen(
                     ) {
                         Icon(
                             painterResource(R.drawable.ic_back),
-                            contentDescription = null,
-                            tint = Color.White,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -399,14 +396,12 @@ fun YTMusicSearchScreen(
                     fontWeight = FontWeight.Bold,
                     fontFamily = SfProFontFamily,
                     letterSpacing = 0.3.sp,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
                 )
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF2C2C2E))
+                        .size(48.dp)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -417,8 +412,8 @@ fun YTMusicSearchScreen(
                     Icon(
                         imageVector = CupertinoIcons.Default.PersonCropCircle,
                         contentDescription = "Account",
-                        modifier = Modifier.size(20.dp),
-                        tint = Color.White
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -477,7 +472,7 @@ private fun AppleSearchBar(
         modifier = modifier
             .height(40.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFF1C1C1E))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .focusRequester(focusRequester)
             .onFocusChanged { onFocusChanged(it.isFocused) }
     ) {
@@ -489,7 +484,7 @@ private fun AppleSearchBar(
                 painterResource(id = R.drawable.ic_uitabbar_search),
                 contentDescription = "Search",
                 modifier = Modifier.size(18.dp),
-                tint = Color(0xFFA0A0A2)
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
             )
             Spacer(Modifier.width(8.dp))
             BasicTextField(
@@ -499,10 +494,10 @@ private fun AppleSearchBar(
                 textStyle = TextStyle(
                     fontSize = 17.sp,
                     fontFamily = SfProFontFamily,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onSurface
                 ),
                 singleLine = true,
-                cursorBrush = SolidColor(Color(0xFFFF3B5C)),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
                     onSearch = {
@@ -520,7 +515,7 @@ private fun AppleSearchBar(
                                 text = "Artists, Songs, Lyrics, and More",
                                 fontSize = 17.sp,
                                 fontFamily = SfProFontFamily,
-                                color = Color(0xFFA0A0A2),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -532,13 +527,12 @@ private fun AppleSearchBar(
             if (query.isNotEmpty()) {
                 IconButton(
                     onClick = onClear,
-                    modifier = Modifier.size(22.dp)
                 ) {
                     Icon(
                         Icons.Default.Clear,
                         contentDescription = "Clear",
                         modifier = Modifier.size(16.dp),
-                        tint = Color(0xFFA0A0A2)
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                 }
             } else {
@@ -546,7 +540,7 @@ private fun AppleSearchBar(
                     Icons.Default.Mic,
                     contentDescription = "Voice Search",
                     modifier = Modifier.size(18.dp),
-                    tint = Color(0xFFA0A0A2)
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             }
         }
@@ -574,7 +568,7 @@ private fun IdlePage(
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = SfProFontFamily,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -674,7 +668,7 @@ private fun CategoryCard(
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = SfProFontFamily,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(start = 14.dp, bottom = 14.dp)
@@ -704,6 +698,7 @@ private fun SuggestionRow(suggestion: String, onClick: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .heightIn(min = 48.dp)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -715,7 +710,7 @@ private fun SuggestionRow(suggestion: String, onClick: (String) -> Unit) {
         Icon(
             Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = null,
-            tint = Color(0xFFA0A0A2).copy(alpha = 0.5f),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f).copy(alpha = 0.5f),
             modifier = Modifier.size(16.dp)
         )
         Spacer(Modifier.width(14.dp))
@@ -723,7 +718,7 @@ private fun SuggestionRow(suggestion: String, onClick: (String) -> Unit) {
             text = suggestion,
             fontSize = 16.sp,
             fontFamily = SfProFontFamily,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -754,14 +749,14 @@ private fun RecentSearchesContent(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = SfProFontFamily,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onSurface
             )
             TextButton(onClick = onClearAll) {
                 Text(
                     text = "Clear",
                     fontSize = 14.sp,
                     fontFamily = SfProFontFamily,
-                    color = Color(0xFFFF3B5C)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -769,7 +764,7 @@ private fun RecentSearchesContent(
         recentSearches.forEach { query ->
             RecentSearchRow(query, onRecentClick)
             HorizontalDivider(
-                color = Color.White.copy(alpha = 0.08f),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
                 thickness = 0.5.dp
             )
         }
@@ -781,6 +776,7 @@ private fun RecentSearchRow(query: String, onClick: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .heightIn(min = 48.dp)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -792,7 +788,7 @@ private fun RecentSearchRow(query: String, onClick: (String) -> Unit) {
         Icon(
             Icons.Default.History,
             contentDescription = null,
-            tint = Color(0xFFA0A0A2).copy(alpha = 0.6f),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f).copy(alpha = 0.6f),
             modifier = Modifier.size(20.dp)
         )
         Spacer(Modifier.width(14.dp))
@@ -800,7 +796,7 @@ private fun RecentSearchRow(query: String, onClick: (String) -> Unit) {
             text = query,
             fontSize = 16.sp,
             fontFamily = SfProFontFamily,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -808,7 +804,7 @@ private fun RecentSearchRow(query: String, onClick: (String) -> Unit) {
         Icon(
             Icons.Default.ChevronRight,
             contentDescription = null,
-            tint = Color(0xFFA0A0A2).copy(alpha = 0.3f),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f).copy(alpha = 0.3f),
             modifier = Modifier.size(18.dp)
         )
     }
@@ -838,14 +834,14 @@ private fun ResultsSection(
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = SfProFontFamily,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onSurface
             )
             if (section.seeAll) {
                 Text(
                     text = "See All",
                     fontSize = 14.sp,
                     fontFamily = SfProFontFamily,
-                    color = Color(0xFFFF3B5C)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -859,12 +855,12 @@ private fun ResultsSection(
 
 @Composable
 private fun AppleSearchResultRow(song: YTSongItem, onClick: (YTSongItem) -> Unit) {
-    val ctx = LocalContext.current
     var isPressed by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .heightIn(min = 48.dp)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -874,17 +870,10 @@ private fun AppleSearchResultRow(song: YTSongItem, onClick: (YTSongItem) -> Unit
             .padding(horizontal = 24.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(ctx)
-                .data(song.thumbnailUrl)
-                .crossfade(true)
-                .error(R.drawable.placeholder_music_default_artwork)
-                .fallback(R.drawable.placeholder_music_default_artwork)
-                .precision(Precision.INEXACT)
-                .size(128)
-                .build(),
+        CachedArtworkImage(
+            url = song.thumbnailUrl,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            size = 128,
             modifier = Modifier
                 .width(52.dp)
                 .height(52.dp)
@@ -902,7 +891,7 @@ private fun AppleSearchResultRow(song: YTSongItem, onClick: (YTSongItem) -> Unit
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onSurface
             )
             val subtitle = buildString {
                 if (song.artists.isNotEmpty()) {
@@ -919,7 +908,7 @@ private fun AppleSearchResultRow(song: YTSongItem, onClick: (YTSongItem) -> Unit
                     text = subtitle,
                     fontSize = 13.sp,
                     fontFamily = SfProFontFamily,
-                    color = Color(0xFFA0A0A2),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -932,7 +921,7 @@ private fun AppleSearchResultRow(song: YTSongItem, onClick: (YTSongItem) -> Unit
                 text = "%d:%02d".format(min, sec),
                 fontSize = 13.sp,
                 fontFamily = SfProFontFamily,
-                color = Color(0xFFA0A0A2).copy(alpha = 0.6f),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f).copy(alpha = 0.6f),
                 modifier = Modifier.padding(start = 10.dp)
             )
         }
@@ -948,7 +937,7 @@ private fun AppleMiniPlayer(modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .height(56.dp),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1E)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Row(
@@ -959,14 +948,14 @@ private fun AppleMiniPlayer(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFF2C2C2E)),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     Icons.Default.MusicNote,
                     contentDescription = null,
                     modifier = Modifier.size(22.dp),
-                    tint = Color(0xFFA0A0A2)
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             }
             Column(
@@ -979,7 +968,7 @@ private fun AppleMiniPlayer(modifier: Modifier = Modifier) {
                     fontSize = 15.sp,
                     fontFamily = SfProFontFamily,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -987,18 +976,18 @@ private fun AppleMiniPlayer(modifier: Modifier = Modifier) {
                     text = "Tap to start listening",
                     fontSize = 12.sp,
                     fontFamily = SfProFontFamily,
-                    color = Color(0xFFA0A0A2),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
             Spacer(Modifier.width(8.dp))
-            IconButton(onClick = { }, modifier = Modifier.size(36.dp)) {
+            IconButton(onClick = { }) {
                 Icon(
                     Icons.Default.PlayArrow,
                     contentDescription = "Play",
                     modifier = Modifier.size(24.dp),
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -1026,7 +1015,7 @@ private fun EmptyView(modifier: Modifier = Modifier) {
             Icons.Default.Search,
             contentDescription = null,
             modifier = Modifier.size(48.dp),
-            tint = Color(0xFFA0A0A2).copy(alpha = 0.3f)
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f).copy(alpha = 0.3f)
         )
         Spacer(Modifier.height(16.dp))
         Text(
@@ -1034,13 +1023,13 @@ private fun EmptyView(modifier: Modifier = Modifier) {
             fontSize = 17.sp,
             fontFamily = SfProFontFamily,
             fontWeight = FontWeight.SemiBold,
-            color = Color(0xFFA0A0A2)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
         )
         Text(
             text = "Try a different search term",
             fontSize = 14.sp,
             fontFamily = SfProFontFamily,
-            color = Color(0xFFA0A0A2).copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f).copy(alpha = 0.6f)
         )
     }
 }

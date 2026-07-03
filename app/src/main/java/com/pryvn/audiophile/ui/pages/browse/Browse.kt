@@ -17,8 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,9 +24,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import coil.size.Precision
+import com.pryvn.audiophile.ui.widgets.basic.AppleLoadingSpinner
+import com.pryvn.audiophile.ui.widgets.basic.CachedArtworkImage
 import io.github.alexzhirkevich.cupertino.icons.CupertinoIcons
 import io.github.alexzhirkevich.cupertino.icons.outlined.PersonCropCircle
 import kotlinx.coroutines.Dispatchers
@@ -101,35 +98,42 @@ fun Browse(
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
                 )
-                Icon(
-                    painterResource(id = R.drawable.ic_uitabbar_search),
-                    contentDescription = "Search",
+                Box(
                     modifier = Modifier
-                        .size(24.dp)
-                        .clickable {
-                            navController.toUI(UI.HomePage)
-                        },
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(Modifier.width(12.dp))
-                Icon(
-                    Icons.Default.Refresh,
-                    contentDescription = "Refresh",
+                        .size(48.dp)
+                        .clickable { navController.toUI(UI.HomePage) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_uitabbar_search),
+                        contentDescription = "Search",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(Modifier.width(4.dp))
+                Box(
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(48.dp)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = { loadBrowse() }
                         ),
-                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                )
-                Spacer(Modifier.width(12.dp))
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Refresh,
+                        contentDescription = "Refresh",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                    )
+                }
+                Spacer(Modifier.width(4.dp))
                 Box(
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(48.dp)
                         .clickable(
-                            enabled = true,
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = { navController.toUI(UI.Settings.Main) }
@@ -139,7 +143,7 @@ fun Browse(
                     Icon(
                         imageVector = CupertinoIcons.Default.PersonCropCircle,
                         contentDescription = "Account",
-                        modifier = Modifier.fillMaxSize().size(24.dp),
+                        modifier = Modifier.size(24.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -158,6 +162,7 @@ fun Browse(
                     val isSelected = selectedSection == index
                     Box(
                         modifier = Modifier
+                            .heightIn(min = 48.dp)
                             .clip(RoundedCornerShape(20.dp))
                             .background(
                                 if (isSelected) MaterialTheme.colorScheme.primary
@@ -185,7 +190,7 @@ fun Browse(
                     Modifier.fillMaxWidth().padding(vertical = 40.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    AppleLoadingSpinner()
                 }
             }
         } else if (loadError) {
@@ -284,7 +289,6 @@ private fun FeaturedCard(
     item: HomeItem,
     onClick: () -> Unit
 ) {
-    val ctx = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -294,17 +298,10 @@ private fun FeaturedCard(
             .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(ctx)
-                .data(item.thumbnailUrl)
-                .crossfade(true)
-                .error(R.drawable.placeholder_music_default_artwork)
-                .fallback(R.drawable.placeholder_music_default_artwork)
-                .precision(Precision.INEXACT)
-                .size(600)
-                .build(),
+        CachedArtworkImage(
+            url = item.thumbnailUrl,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            size = 600,
             modifier = Modifier.fillMaxSize()
         )
         Box(
@@ -349,24 +346,16 @@ private fun BrowseCard(
     item: HomeItem,
     onClick: () -> Unit
 ) {
-    val ctx = LocalContext.current
     Column(
         modifier = Modifier
             .width(150.dp)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(ctx)
-                .data(item.thumbnailUrl)
-                .crossfade(true)
-                .error(R.drawable.placeholder_music_default_artwork)
-                .fallback(R.drawable.placeholder_music_default_artwork)
-                .precision(Precision.INEXACT)
-                .size(300)
-                .build(),
+        CachedArtworkImage(
+            url = item.thumbnailUrl,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            size = 300,
             modifier = Modifier
                 .width(150.dp)
                 .height(150.dp),

@@ -8,17 +8,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import coil.size.Precision
+import com.pryvn.audiophile.ui.widgets.basic.CachedArtworkImage
 import com.pryvn.audiophile.R
 import com.pryvn.audiophile.code.api.YouTubeApi
 import com.pryvn.audiophile.code.api.YTPlaylist
@@ -32,7 +28,6 @@ import kotlinx.coroutines.withContext
 @Composable
 fun YTMusicPlaylistsScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
-    val ctx = LocalContext.current
     var playlists by remember { mutableStateOf<List<YTPlaylist>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var isRefreshing by remember { mutableStateOf(false) }
@@ -149,7 +144,6 @@ fun YTMusicPlaylistsScreen(navController: NavController) {
 
 @Composable
 private fun PlaylistRow(playlist: YTPlaylist, onClick: () -> Unit) {
-    val ctx = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -158,17 +152,10 @@ private fun PlaylistRow(playlist: YTPlaylist, onClick: () -> Unit) {
             .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(ctx)
-                .data(playlist.thumbnailUrl)
-                .crossfade(true)
-                .error(R.drawable.placeholder_music_default_artwork)
-                .fallback(R.drawable.placeholder_music_default_artwork)
-                .precision(Precision.INEXACT)
-                .size(128)
-                .build(),
+        CachedArtworkImage(
+            url = playlist.thumbnailUrl,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            size = 128,
             modifier = Modifier
                 .width(48.dp)
                 .height(48.dp),

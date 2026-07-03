@@ -13,10 +13,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,9 +20,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import coil.size.Precision
 import io.github.alexzhirkevich.cupertino.icons.CupertinoIcons
 import io.github.alexzhirkevich.cupertino.icons.outlined.PersonCropCircle
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +33,8 @@ import com.pryvn.audiophile.data.models.ImageViewModel
 import com.pryvn.audiophile.ui.UI
 import com.pryvn.audiophile.ui.toUI
 import com.pryvn.audiophile.ui.theme.SfProFontFamily
+import com.pryvn.audiophile.ui.widgets.basic.AppleLoadingSpinner
+import com.pryvn.audiophile.ui.widgets.basic.CachedArtworkImage
 
 @Composable
 fun Home(
@@ -97,35 +92,42 @@ fun Home(
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
                 )
-                Icon(
-                    painterResource(id = R.drawable.ic_uitabbar_search),
-                    contentDescription = "Search",
+                Box(
                     modifier = Modifier
-                        .size(24.dp)
-                        .clickable {
-                            navController.toUI(UI.HomePage)
-                        },
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(Modifier.width(12.dp))
-                Icon(
-                    Icons.Default.Refresh,
-                    contentDescription = "Refresh",
+                        .size(48.dp)
+                        .clickable { navController.toUI(UI.HomePage) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_uitabbar_search),
+                        contentDescription = "Search",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(Modifier.width(4.dp))
+                Box(
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(48.dp)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = { loadHome() }
                         ),
-                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                )
-                Spacer(Modifier.width(12.dp))
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Refresh,
+                        contentDescription = "Refresh",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                    )
+                }
+                Spacer(Modifier.width(4.dp))
                 Box(
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(48.dp)
                         .clickable(
-                            enabled = true,
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = { navController.toUI(UI.Settings.Main) }
@@ -135,7 +137,7 @@ fun Home(
                     Icon(
                         imageVector = CupertinoIcons.Default.PersonCropCircle,
                         contentDescription = "Account",
-                        modifier = Modifier.fillMaxSize().size(24.dp),
+                        modifier = Modifier.size(24.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -148,7 +150,7 @@ fun Home(
                     Modifier.fillMaxWidth().padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.5.dp)
+                    AppleLoadingSpinner(modifier = Modifier.size(24.dp), size = 24.dp)
                 }
             }
         }
@@ -277,24 +279,16 @@ private fun HomeCard(
     item: com.pryvn.audiophile.code.api.HomeItem,
     onClick: () -> Unit,
 ) {
-    val ctx = LocalContext.current
     Column(
         modifier = Modifier
             .width(150.dp)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(ctx)
-                .data(item.thumbnailUrl)
-                .crossfade(true)
-                .error(R.drawable.placeholder_music_default_artwork)
-                .fallback(R.drawable.placeholder_music_default_artwork)
-                .precision(Precision.INEXACT)
-                .size(300)
-                .build(),
+        CachedArtworkImage(
+            url = item.thumbnailUrl,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            size = 300,
             modifier = Modifier
                 .width(150.dp)
                 .height(150.dp),

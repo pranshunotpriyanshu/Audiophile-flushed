@@ -9,17 +9,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import coil.size.Precision
+import com.pryvn.audiophile.ui.widgets.basic.CachedArtworkImage
 import com.pryvn.audiophile.R
 import com.pryvn.audiophile.code.MediaController
 import com.pryvn.audiophile.code.api.HomeItem
@@ -115,24 +111,16 @@ fun YTMusicExploreScreen(navController: NavController) {
 
 @Composable
 private fun ExploreItemCard(item: HomeItem, onClick: () -> Unit) {
-    val ctx = LocalContext.current
     Column(
         modifier = Modifier
             .width(140.dp)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(ctx)
-                .data(item.thumbnailUrl)
-                .crossfade(true)
-                .error(R.drawable.placeholder_music_default_artwork)
-                .fallback(R.drawable.placeholder_music_default_artwork)
-                .precision(Precision.INEXACT)
-                .size(280)
-                .build(),
+        CachedArtworkImage(
+            url = item.thumbnailUrl,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            size = 280,
             modifier = Modifier
                 .width(140.dp)
                 .height(140.dp)

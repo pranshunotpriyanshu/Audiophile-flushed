@@ -162,9 +162,6 @@ fun ShadowImageWithCache(
                 compositingStrategy = CompositingStrategy.Offscreen
                 clip = true
                 this.shape = shape
-                /*this.shape = shape
-                shadowElevation = shadowAlphaPx
-                spotShadowColor = Color.Black.copy(alpha = 0.8f)*/
             }
             .drawWithCache {
                 onDrawWithContent {
@@ -188,5 +185,33 @@ fun ShadowImageWithCache(
                 }
             }
 
+    )
+}
+
+@Composable
+fun CachedArtworkImage(
+    url: String?,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Crop,
+    size: Int = 300,
+    precision: Precision = Precision.INEXACT,
+) {
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current).data(data = url).crossfade(true)
+            .error(R.drawable.placeholder_music_default_artwork)
+            .placeholder(R.drawable.placeholder_music_default_artwork)
+            .fallback(R.drawable.placeholder_music_default_artwork)
+            .placeholderMemoryCacheKey(url.toString())
+            .memoryCacheKey(url.toString())
+            .diskCacheKey(url.toString())
+            .allowHardware(true)
+            .crossfade(true)
+            .precision(precision)
+            .size(size)
+            .build(),
+        contentDescription = contentDescription,
+        contentScale = contentScale,
+        modifier = modifier,
     )
 }
